@@ -1,1 +1,103 @@
+function [q_ref_L, q_ref_R, t_sim] = bezier_curve_jump(initial_pos, jump_height, jump_flag)
+% This function generates bezier curve trajectories for leg motion during jumping.
+
+% Define parameters
+p.gait_period = 0.4;          % Period of the gait cycle
+p.t_start = 0.1;              % Start time
+gait_length = 2;              % Number of gait cycles
+p.t_end = gait_length * p.gait_period + p.t_start; % End time of the simulation
+p.dt = 0.005;                 % Time step
+t_sim = 0:p.dt:p.t_end;       % Array of time stamps
+N = length(t_sim);            % Number of time steps
+
+% Initialize bezier curves for left and right legs
+q_ref_L = zeros(3, N);
+q_ref_R = zeros(3, N);
+
+% Generate bezier curves for initial leg positions
+BL = bezier_curve_jump_initial(initial_pos);
+BR = bezier_curve_jump_initial(initial_pos);
+BR(2, :) = -BR(2, :); % Reflect the bezier curve for the right leg
+
+% Iterate over time steps
+for i = 1:N
+    t = t_sim(i);
+    if (t < p.t_start) % Delay phase
+        s = 0;
+        s0 = 0;
+    else
+        s = (mod(t - p.t_start, p.gait_period)) / p.gait_period;
+        if (s < s0)
+            % Generate bezier curve for jump trajectory
+            [B_swing] = bezier_curve_jump_traj(initial_pos, jump_height);
+            BL = B_swing;
+            BR = B_swing;
+            BR(2, :) = -BR(2, :);
+        end
+        s0 = s;
+    end
+    
+    % Compute leg positions using bezier curves
+    pos_foot_L_ref = bezier4(BL, s);
+    pos_foot_R_ref = bezier4(BR, s);
+    
+    % Store leg positions
+    q_ref_L(:, i) = pos_foot_L_ref;
+    q_ref_R(:, i) = pos_foot_R_ref;
+end
+
+% Generate bezier curves for end stance
+BL = bezier_curve_jump_end(initial_pos);
+BR = bezier_curve_jump_end(initial_pos);
+BR(2, :) = -BR(2, :);
+
+end
+
+% Bezier curve evaluation function
+function x = bezier4(B, s)
+% Evaluate a 4th-order bezier curve
+x = zeros([3, 1]);
+for i = 0:4
+    x = x + nchoosek(4, i) * (1 - s)^(4 - i) * s^i * B(:, i + 1);
+end
+end
+
+% Generate bezier curve parameters for jump trajectory
+function [B_swing] = bezier_curve_jump_traj(initial_pos, jump_height)
+% Define bezier curve control points for a jump trajectory
+k = initial_pos;
+crouch_height = 0.8;
+% Initial and final states bezier parameter
+B_swing(:,1)  = [k(1); k(2); k(3)]; % initial ascent
+B_swing(:,5)  = [k(1); k(2); k(3)]; % final touch down
+
+% Bezier midpoint parameter
+B_swing(:,2) = [k(1); k(2); k(3) + crouch_height]; % crouching 
+B_swing(:,4) = [k(1); k(2); k(3) - jump_height/2]; % Landing approach
+
+% landing 
+B_swing(:,3)  = [k(1); k(2); k(3) - jump_height]; % Highest point
+end
+
+% Generate initial bezier curve parameters
+function [B_swing] = bezier_curve_jump_initial(initial_pos)
+k = initial_pos;
+
+B_swing(:, 1) = [k(1); k(2); k(3)];
+B_swing(:, 5) = [k(1); k(2); k(3)];
+B_swing(:, 2) = [k(1); k(2); k(3)];
+B_swing(:, 4) = [k(1); k(2); k(3)];
+B_swing(:, 3) = [k(1); k(2); k(3)];
+end
+
+% Generate end bezier curve parameters
+function [B_swing] = bezier_curve_jump_end(initial_pos)
+k = initial_pos;
+
+B_swing(:, 1) = [k(1); k(2); k(3)];
+B_swing(:, 5) = [k(1); k(2); k(3)];
+B_swing(:, 2) = [k(1); k(2); k(3)];
+B_swing(:, 4) = [k(1); k(2); k(3)];
+B_swing(:, 3) = [k(1); k(2); k(3)];
+end
 
