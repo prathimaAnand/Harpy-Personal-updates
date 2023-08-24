@@ -50,6 +50,7 @@ for i = 1:N % 22nd iteration t > p.t_start
             BL = B_swing; % 3x5 matrix
             BR = B_swing;
             BR(2, :) = -BR (2, :);
+            
             % plot for control points
             plot(t,BR);
             hold on;
@@ -64,6 +65,7 @@ for i = 1:N % 22nd iteration t > p.t_start
             BL = B_swing;
             BR = B_swing;
             BR(2, :) = -BR(2, :);
+            
             plot(t,BR);
             hold on;
         end
@@ -78,6 +80,7 @@ for i = 1:N % 22nd iteration t > p.t_start
             BL = B_swing;
             BR = B_swing;
             BR(2, :) = -BR(2, :);
+            
             plot(t,BR);
             hold on;
         end  
