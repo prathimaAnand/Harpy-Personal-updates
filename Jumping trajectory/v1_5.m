@@ -15,7 +15,7 @@ p.t_fourth_pt = 0.25;
 % Define parameters
 % Period of the gait cycles for 3 bezier curves
 p.gait_period_first = p.t_second_pt - p.t_first_pt; % 0.07
-p.gait_period_second = p.t_third_pt1 - p.t_second_pt; % 0.03
+p.gait_period_second = p.t_third_pt - p.t_second_pt; % 0.03
 p.gait_period_third = p.t_fourth_pt - p.t_third_pt; % 0.05
 p.gait_period_total = p.t_fourth_pt - p.t_first_pt; % 0.15
 
@@ -45,7 +45,6 @@ for i = 1:N % 22nd iteration t > p.t_start
     % elseif (ge(t,p.t_first_pt) && (t <= p.t_second_pt)) % time difference is approx val
     elseif (s <= 1)
 
-        flag = flag + 1 ;
         % s = (t - p.t_first_pt) / p.gait_period_first;
         s = (mod(t - p.t_first_pt, p.gait_period_first)) / p.gait_period_first; % gait_period_first = 0.07
         if (s > s0)
@@ -66,8 +65,7 @@ for i = 1:N % 22nd iteration t > p.t_start
         % s = (t - p.t_second_pt) / p.gait_period_second;
         s = (mod(t - p.t_second_pt, p.gait_period_second)) / p.gait_period_second; % gait_period_second = 0.03
         if (s > s0)
-        % if (s < s0 && flag == 2)
-            % while(s <= 1)
+        
                 % Generate bezier curve 2 for jump trajectory
                 [B_swing] = bezier_curve_jump_traj_2(initial_pos, jump_height);
                 BL = B_swing;
@@ -84,8 +82,7 @@ for i = 1:N % 22nd iteration t > p.t_start
         % s = (t - p.t_third_pt) / p.gait_period_third;
         s = (mod(t - p.t_third_pt, p.gait_period_third)) / p.gait_period_third; % gait_period_third = 0.05
         if (s > s0)
-        % if (s < s0 && flag == 3)
-            % while(s <= 1)
+      
                 % Generate bezier curve 3 for jump trajectory
                 [B_swing] = bezier_curve_jump_traj_3(initial_pos, jump_height);
                 BL = B_swing;
