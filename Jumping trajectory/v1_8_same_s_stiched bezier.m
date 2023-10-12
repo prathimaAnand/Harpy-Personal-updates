@@ -7,7 +7,7 @@ function [q_ref_L, q_ref_R, t_sim,s0] = bezier_curve_jump(initial_pos, jump_heig
 % instantaneous jump
 % smooth transition from stance to crouch
 % add end stance bezier
-
+  
 p.gait_period = 0.4;          % Period of the gait cycle
 p.t_start = 0.2;              % Start time
 gait_length = 3;              % Number of gait cycles
